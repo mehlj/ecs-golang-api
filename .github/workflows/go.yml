@@ -1,0 +1,32 @@
+name: mehlj-ci
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Build Docker image
+      run: docker build -t docker.io/mehlj/mehlj-pipeline:latest .
+
+    - name: Grab go dependencies
+      run: go get -u github.com/gorilla/mux
+    
+    - name: Run unit tests
+      run: go test -v api/main_test.go api/main.go
+    
+    - name: Lint Dockerfile
+      run: hadolint Dockerfile
+    
+    - name: Push Docker image
+      run: docker image push docker.io/mehlj/mehlj-pipeline:latest
+      
+    - name: Deploy to kubernetes
+      run: ssh root@k8snode0 kubectl rollout restart deployment mehlj-pipeline-deploy
