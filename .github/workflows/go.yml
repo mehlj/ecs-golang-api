@@ -25,7 +25,10 @@ jobs:
     
     - name: Lint Dockerfile
       run: hadolint Dockerfile
-    
+      
+  deploy:
+    runs-on: mehlj-lab-runners
+    steps:
     - name: Push Docker image
       run: docker image push docker.io/mehlj/mehlj-pipeline:latest
       
