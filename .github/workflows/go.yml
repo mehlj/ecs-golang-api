@@ -38,4 +38,4 @@ jobs:
       run: docker image push docker.io/mehlj/mehlj-pipeline:latest
       
     - name: Deploy to kubernetes
-      run: ssh root@k8snode0 kubectl rollout restart deployment mehlj-pipeline-deploy
+      run: ssh -o StrictHostKeyChecking=no root@k8snode0 kubectl rollout restart deployment mehlj-pipeline-deploy
