@@ -7,11 +7,6 @@ import (
   _ "github.com/mattn/go-sqlite3"
 )
 
-type Product struct {
-  Name     string `json:"Name"`
-  Quantity int    `json:"quantity"`
-}
-
 func GetAllRows() []Product{
   // open connection
   db, err := sql.Open("sqlite3", "/opt/db/api.db")
