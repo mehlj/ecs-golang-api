@@ -6,6 +6,6 @@ COPY api/* /opt/mehlj-pipeline/api/
 
 RUN go get -u github.com/gorilla/mux &&\
     go get -u github.com/mattn/go-sqlite3 &&\
-    go build main.go
+    go build main.go sql.go
 
 CMD ["./main"]
