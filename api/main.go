@@ -23,7 +23,7 @@ func DefaultHandler(w http.ResponseWriter, r *http.Request) {
 
 func QueryAllProducts(w http.ResponseWriter, r *http.Request) {
   w.Header().Set("Content-Type", "application/json")
-  json.NewEncoder(w).Encode(products)
+  json.NewEncoder(w).Encode(GetAllRows())
 }
 
 func CreateProduct(w http.ResponseWriter, r *http.Request) {
