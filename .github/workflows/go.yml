@@ -22,7 +22,7 @@ jobs:
     needs: build
     steps:
     - name: Grab go dependencies
-      run: go get -u github.com/gorilla/mux
+      run: go get -u github.com/gorilla/mux github.com/mattn/go-sqlite3
     
     - name: Run unit tests
       run: go test -v api/main_test.go api/main.go api/sql.go
