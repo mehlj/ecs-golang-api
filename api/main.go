@@ -33,20 +33,17 @@ func CreateProduct(w http.ResponseWriter, r *http.Request) {
   var p Product
   json.Unmarshal(b, &p)        // convert JSON -> byte slice, store in var p
 
-  InsertProduct(p)
+  InsertRow(p)
   json.NewEncoder(w).Encode(p) // echo product back to the user
 }
 
 func DeleteProduct(w http.ResponseWriter, r *http.Request) {
-  v := mux.Vars(r)
-  k := v["name"]
+  b, _ := ioutil.ReadAll(r.Body)
 
-  // Loop through all inventory, if product.Name == key, remove it from slice
-  for i, product := range products {
-    if product.Name == k {
-      products = append(products[:i], products[i+1:]...)
-    }
-  }
+  var p Product
+  json.Unmarshal(b, &p)        // convert JSON -> byte slice, store in var p
+
+  RemoveRow(p)
 }
 
 func UpdateProduct(w http.ResponseWriter, r *http.Request) {

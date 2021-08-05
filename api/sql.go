@@ -31,7 +31,7 @@ func GetAllRows() []Product{
   return products
 }
 
-func InsertProduct(product Product){
+func InsertRow(product Product){
   // open connection
   db, err := sql.Open("sqlite3", "/opt/db/api.db")
   checkSQLError(err)
@@ -42,6 +42,22 @@ func InsertProduct(product Product){
 
   // execute statement
   _, err = stmt.Exec(product.Name, product.Quantity)
+  checkSQLError(err)
+
+  db.Close()
+}
+
+func RemoveRow(product Product){
+  // open connection
+  db, err := sql.Open("sqlite3", "/opt/db/api.db")
+  checkSQLError(err)
+
+  // build statement
+  stmt, err := db.Prepare("DELETE FROM products WHERE name=?")
+  checkSQLError(err)
+
+  // execute statement
+  _, err = stmt.Exec(product.Name)
   checkSQLError(err)
 
   db.Close()
