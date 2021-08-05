@@ -41,8 +41,8 @@ func InsertProduct(product Product){
   checkSQLError(err)
 
   // execute statement
-  res, err := stmt.Exec(product.name, product.quantity)
-  checkErr(err)
+  _, err = stmt.Exec(product.Name, product.Quantity)
+  checkSQLError(err)
 
   db.Close()
 }
