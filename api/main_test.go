@@ -35,10 +35,6 @@ func TestDefaultHandler(t *testing.T) {
 
 func TestQueryAllProducts(t *testing.T) {
   req, err := http.NewRequest("GET", "/products", nil)
-  products = []Product{
-    Product{Name:"apple",  Quantity:54},
-    Product{Name:"pear",   Quantity:12},
-  }
 
   // fail test if query returns error
   if err != nil {
@@ -56,7 +52,7 @@ func TestQueryAllProducts(t *testing.T) {
   }
 
   // ensure response body is what we expect
-  expected := `[{"Name":"oranges","quantity":25},{"Name":"apples","quantity":53},{"Name":"bananas","quantity":34}]` + "\n"
+  expected := `[{"Name":"apple","quantity":54},{"Name":"pear","quantity":12}]` + "\n"
 
   if rr.Body.String() != expected {
     t.Errorf("handler returned unexpected body: got %v want %v",
