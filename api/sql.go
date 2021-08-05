@@ -10,7 +10,7 @@ func GetAllRows() []Product{
   db, err := sql.Open("sqlite3", "/opt/db/api.db")
   checkSQLError(err)
 
-  // build query
+  // build statement
   rows, err := db.Query("SELECT * FROM products")
   checkSQLError(err)
 
@@ -29,6 +29,22 @@ func GetAllRows() []Product{
   rows.Close()
 
   return products
+}
+
+func InsertProduct(product Product){
+  // open connection
+  db, err := sql.Open("sqlite3", "/opt/db/api.db")
+  checkSQLError(err)
+
+  // build statement
+  stmt, err := db.Prepare("INSERT INTO products(name, quantity)  values(?,?)")
+  checkSQLError(err)
+
+  // execute statement
+  res, err := stmt.Exec(product.name, product.quantity)
+  checkErr(err)
+
+  db.Close()
 }
 
 

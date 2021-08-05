@@ -93,7 +93,7 @@ func TestCreateProduct(t *testing.T) {
   rr = httptest.NewRecorder()
   handler = http.HandlerFunc(QueryAllProducts)
   handler.ServeHTTP(rr, req)
-  expected = `[{"Name":"oranges","quantity":25},{"Name":"apples","quantity":53},{"Name":"bananas","quantity":34},{"Name":"testobject","quantity":3}]` + "\n"
+  expected = `[{"Name":"apple","quantity":54},{"Name":"pear","quantity":12},{"Name":"testobject","quantity":3}]` + "\n"
 
   if rr.Body.String() != expected {
     t.Errorf("handler did not successfully add object. got %v want %v",
