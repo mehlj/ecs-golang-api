@@ -36,9 +36,8 @@ func TestDefaultHandler(t *testing.T) {
 func TestQueryAllProducts(t *testing.T) {
   req, err := http.NewRequest("GET", "/products", nil)
   products = []Product{
-    Product{Name:"oranges",  Quantity:25},
-    Product{Name:"apples",   Quantity:53},
-    Product{Name:"bananas",  Quantity:34},
+    Product{Name:"apple",  Quantity:54},
+    Product{Name:"pear",   Quantity:12},
   }
 
   // fail test if query returns error

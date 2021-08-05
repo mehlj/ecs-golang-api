@@ -2,7 +2,6 @@ package main
 
 import (
   "database/sql"
-  "fmt"
   _ "github.com/mattn/go-sqlite3"
 )
 
@@ -23,9 +22,6 @@ func GetAllRows() []Product{
   for rows.Next() {
     err = rows.Scan(&name, &quantity)
     checkSQLError(err)
-
-    fmt.Println(name)
-    fmt.Println(quantity)
 
     products = append(products, Product{Name:name, Quantity:quantity})
   }
