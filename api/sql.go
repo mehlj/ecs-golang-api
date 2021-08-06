@@ -2,6 +2,7 @@ package main
 
 import (
   "database/sql"
+  "fmt"
   _ "github.com/mattn/go-sqlite3"
 )
 
@@ -47,7 +48,7 @@ func InsertRow(product Product){
   db.Close()
 }
 
-func RemoveRow(product Product){
+func RemoveRow(k string){
   // open connection
   db, err := sql.Open("sqlite3", "/opt/db/api.db")
   checkSQLError(err)
@@ -57,7 +58,8 @@ func RemoveRow(product Product){
   checkSQLError(err)
 
   // execute statement
-  _, err = stmt.Exec(product.Name)
+  fmt.Println(k)
+  _, err = stmt.Exec(k)
   checkSQLError(err)
 
   db.Close()

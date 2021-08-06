@@ -31,19 +31,18 @@ func CreateProduct(w http.ResponseWriter, r *http.Request) {
   b, _ := ioutil.ReadAll(r.Body)
 
   var p Product
-  json.Unmarshal(b, &p)        // convert JSON -> byte slice, store in var p
+  json.Unmarshal(b, &p)        // convert JSON -> byte slice, store in Product p
 
   InsertRow(p)
   json.NewEncoder(w).Encode(p) // echo product back to the user
 }
 
 func DeleteProduct(w http.ResponseWriter, r *http.Request) {
-  b, _ := ioutil.ReadAll(r.Body)
+  v := mux.Vars(r)
+  k := v["name"]
 
-  var p Product
-  json.Unmarshal(b, &p)        // convert JSON -> byte slice, store in var p
-
-  RemoveRow(p)
+  fmt.Println(k)
+  RemoveRow(k)
 }
 
 func UpdateProduct(w http.ResponseWriter, r *http.Request) {
