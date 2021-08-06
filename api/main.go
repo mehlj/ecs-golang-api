@@ -41,7 +41,6 @@ func DeleteProduct(w http.ResponseWriter, r *http.Request) {
   v := mux.Vars(r)
   k := v["name"]
 
-  fmt.Println(k)
   RemoveRow(k)
 }
 

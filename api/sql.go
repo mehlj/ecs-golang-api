@@ -2,7 +2,6 @@ package main
 
 import (
   "database/sql"
-  "fmt"
   _ "github.com/mattn/go-sqlite3"
 )
 
@@ -58,7 +57,6 @@ func RemoveRow(k string){
   checkSQLError(err)
 
   // execute statement
-  fmt.Println(k)
   _, err = stmt.Exec(k)
   checkSQLError(err)
 
