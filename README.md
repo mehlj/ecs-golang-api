@@ -29,5 +29,5 @@ $ curl -d '{"Name":"oranges","quantity":4}' -X PUT localhost:3000/product/orange
 
 ### Delete
 ```
-$ curl -X DELETE localhost:3000/product/ball
+$ curl -d '{"Name":"ball","quantity":4}' -X DELETE localhost:3000/product
 ```
