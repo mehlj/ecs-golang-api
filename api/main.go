@@ -38,10 +38,15 @@ func CreateProduct(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteProduct(w http.ResponseWriter, r *http.Request) {
-  v := mux.Vars(r)
-  k := v["name"]
+  w.Header().Set("Content-Type", "application/json")
+  b, _ := ioutil.ReadAll(r.Body)
 
-  RemoveRow(k)
+  var p Product
+  json.Unmarshal(b, &p)        // convert JSON -> byte slice, store in Product p
+
+  RemoveRow(p)
+
+  json.NewEncoder(w).Encode(p) // echo removed product back to the user
 }
 
 func UpdateProduct(w http.ResponseWriter, r *http.Request) {
@@ -88,9 +93,9 @@ func main() {
   r.HandleFunc("/", DefaultHandler)
   r.HandleFunc("/products", QueryAllProducts)
   r.HandleFunc("/product", CreateProduct).Methods("POST")
-  r.HandleFunc("/product/{name}", DeleteProduct).Methods("DELETE")
+  r.HandleFunc("/product", DeleteProduct).Methods("DELETE")
   r.HandleFunc("/product/{name}", UpdateProduct).Methods("PUT")
-  r.HandleFunc("/product/{name}", QueryProduct)
+  r.HandleFunc("/product/{name}", QueryProduct).Methods("GET")
 
   log.Fatal(http.ListenAndServe(":3000", r))
 }

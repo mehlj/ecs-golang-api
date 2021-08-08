@@ -102,7 +102,9 @@ func TestCreateProduct(t *testing.T) {
 }
 
 func TestDeleteProduct(t *testing.T) {
-  req, err := http.NewRequest(http.MethodDelete, "/product/testobject", nil)
+  var productToBeDeleted = []byte(`{"Name":"testobject","quantity":3}`)
+
+  req, err := http.NewRequest("DELETE", "/product", bytes.NewBuffer(productToBeDeleted))
 
   // fail test if query returns error
   if err != nil {
@@ -119,12 +121,8 @@ func TestDeleteProduct(t *testing.T) {
       status, http.StatusOK)
   }
 
-  // ensure that the product is actually deleted
-  req,err = http.NewRequest("GET", "/products", nil)
-  rr = httptest.NewRecorder()
-  handler = http.HandlerFunc(QueryAllProducts)
-  handler.ServeHTTP(rr, req)
-  expected := `[{"Name":"apple","quantity":54},{"Name":"pear","quantity":12}]` + "\n"
+  // ensure response body is as we expect
+  expected := `{"Name":"testobject","quantity":3}` + "\n"
 
   if rr.Body.String() != expected {
     t.Errorf("handler did not successfully delete object. got %v want %v",
