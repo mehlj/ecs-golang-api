@@ -15,8 +15,6 @@ type Product struct {
   Quantity int    `json:"quantity"`
 }
 
-var products []Product
-
 func DefaultHandler(w http.ResponseWriter, r *http.Request) {
   fmt.Fprintf(w, "Hello world\n")
 }
@@ -45,57 +43,40 @@ func DeleteProduct(w http.ResponseWriter, r *http.Request) {
   json.Unmarshal(b, &p)        // convert JSON -> byte slice, store in Product p
 
   RemoveRow(p)
-
   json.NewEncoder(w).Encode(p) // echo removed product back to the user
 }
 
 func UpdateProduct(w http.ResponseWriter, r *http.Request) {
-  // mux variable input
-  v := mux.Vars(r)
-  k := v["name"]
-
-  // read http body and store in Product p
+  w.Header().Set("Content-Type", "application/json")
   b, _ := ioutil.ReadAll(r.Body)
-  var p Product
-  json.Unmarshal(b, &p)
 
-  for i, product := range products {
-    if product.Name == k {
-      products[i] = p
-    }
-  }
+  var p Product
+  json.Unmarshal(b, &p)        // convert JSON -> byte slice, store in Product p
+
+  UpdateRow(p)
+  json.NewEncoder(w).Encode(p) // echo updated product back to the user
 }
 
+// URL : /product?name=apple
 func QueryProduct(w http.ResponseWriter, r *http.Request) {
   w.Header().Set("Content-Type", "application/json")
 
-  v := mux.Vars(r)
-  k := v["name"]
+  k := r.URL.Query().Get("name")
 
-  // Loop through all inventory, if product.Name == key, return JSON
-  for _, product := range products {
-    if product.Name == k {
-      json.NewEncoder(w).Encode(product)
-    }
-  }
+  p := QueryRow(k)
+  json.NewEncoder(w).Encode(p)
 }
 
 
 func main() {
-  products = []Product{
-    Product{Name:"oranges",  Quantity:25},
-    Product{Name:"apples",   Quantity:53},
-    Product{Name:"bananas",  Quantity:34},
-  }
-
   r := mux.NewRouter().StrictSlash(true)
 
   r.HandleFunc("/", DefaultHandler)
   r.HandleFunc("/products", QueryAllProducts)
   r.HandleFunc("/product", CreateProduct).Methods("POST")
   r.HandleFunc("/product", DeleteProduct).Methods("DELETE")
-  r.HandleFunc("/product/{name}", UpdateProduct).Methods("PUT")
-  r.HandleFunc("/product/{name}", QueryProduct).Methods("GET")
+  r.HandleFunc("/product", UpdateProduct).Methods("PUT")
+  r.HandleFunc("/product", QueryProduct).Methods("GET")
 
   log.Fatal(http.ListenAndServe(":3000", r))
 }
