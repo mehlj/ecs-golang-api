@@ -2,6 +2,7 @@ package main
 
 import (
   "database/sql"
+  "fmt"
   _ "github.com/mattn/go-sqlite3"
 )
 
@@ -38,6 +39,8 @@ func InsertRow(product Product){
   stmt, err := db.Prepare("INSERT INTO products(name, quantity)  values(?,?)")
   checkSQLError(err)
 
+  fmt.Println("insert name is", prodcut.Name)
+
   // execute statement
   _, err = stmt.Exec(product.Name, product.Quantity)
   checkSQLError(err)
@@ -48,6 +51,7 @@ func RemoveRow(product Product){
   db, err := sql.Open("sqlite3", "/opt/db/api.db")
   checkSQLError(err)
 
+  fmt.Println("delete name is", product.Name)
   // delete product
   _, err = db.Exec("DELETE FROM products WHERE name=?", product.Name)
   checkSQLError(err)
