@@ -39,7 +39,7 @@ func InsertRow(product Product){
   stmt, err := db.Prepare("INSERT INTO products(name, quantity)  values(?,?)")
   checkSQLError(err)
 
-  fmt.Println("insert name is", prodcut.Name)
+  fmt.Println("insert name is", product.Name)
 
   // execute statement
   _, err = stmt.Exec(product.Name, product.Quantity)
