@@ -24,7 +24,7 @@ $ curl localhost:3000/product/oranges
 
 ### Update
 ```
-$ curl -d '{"Name":"oranges","quantity":4}' -X PUT localhost:3000/product/oranges
+$ curl -d '{"Name":"oranges","quantity":4}' -X PUT localhost:3000/product
 ```
 
 ### Delete
