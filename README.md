@@ -31,3 +31,10 @@ $ curl -d '{"Name":"oranges","quantity":4}' -X PUT localhost:3000/product
 ```
 $ curl -d '{"Name":"ball","quantity":4}' -X DELETE localhost:3000/product
 ```
+
+
+#### Go dependencies
+```
+$ go mod init mehlj-pipeline
+$ go mod tidy
+```
