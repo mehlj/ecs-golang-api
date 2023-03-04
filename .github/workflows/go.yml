@@ -35,6 +35,9 @@ jobs:
     name: Deploy ECR repository
     runs-on: ubuntu-22.04
     # needs: test
+    defaults:
+      run:
+        working-directory: ./terraform
     outputs:
       REPOSITORY_URL: ${{ steps.get_repo_url.outputs.REPOSITORY_URL }}
 
@@ -49,7 +52,6 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
 
-    - run: cd ./terraform/
     - run: terraform init
     - run: terraform fmt -check
     - run: terraform plan
