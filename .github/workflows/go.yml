@@ -57,6 +57,8 @@ jobs:
     - run: terraform plan
     - run: terraform apply -target aws_ecr_repository.ecr -target aws_iam_policy_document.ecrpolicy -target aws_ecr_repository_policy.ecrpolicy -auto-approve
 
+    - run: terraform output -raw repository_url
+    
     - id: get_repo_url
       run: echo "REPOSITORY_URL=$(terraform output -raw repository_url)" >> "$GITHUB_OUTPUT"
 
