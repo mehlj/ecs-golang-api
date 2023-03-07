@@ -67,6 +67,9 @@ jobs:
   build:
     name: Build and push image to ECR
     runs-on: ubuntu-22.04
+    defaults:
+      run:
+        working-directory: ./terraform
     needs: create_repo
 
     steps:
