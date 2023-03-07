@@ -18,4 +18,11 @@ terraform {
 provider "aws" {
   alias  = "virginia"
   region = "us-east-1"
+
+  # helps track project-specific costs
+  default_tags {
+    tags = {
+      Project = "mehlj-pipeline"
+    }
+  }
 }

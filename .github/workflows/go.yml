@@ -84,15 +84,32 @@ jobs:
       uses: aws-actions/amazon-ecr-login@v1
 
     - name: Build, tag, and push the image to Amazon ECR
-      id: build-image
       env:
         ECR_REPOSITORY: ${{needs.create_repo.outputs.REPOSITORY_URL}}
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        # Build a docker container and push it to ECR 
-        echo $ECR_REPOSITORY
-        echo $IMAGE_TAG
         docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
-        echo "Pushing image to ECR..."
         docker push $ECR_REPOSITORY:$IMAGE_TAG
-        echo "name=image::$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+        docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REPOSITORY:latest
+        docker push $ECR_REPOSITORY:latest
+
+  deploy:
+    name: Deploy ECR image to ECS cluster
+    runs-on: ubuntu-22.04
+    needs: build
+
+    steps:
+    - uses: actions/checkout@v3
+    - uses: hashicorp/setup-terraform@v2
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - run: terraform init
+    - run: terraform fmt -check
+    - run: terraform plan
+    - run: terraform apply -auto-approve
