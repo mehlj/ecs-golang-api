@@ -1,6 +1,6 @@
 resource "aws_security_group" "task_sg" {
-  name        = "ecs-security-group"
-  vpc_id      = aws_vpc.ecs_vpc.id
+  name   = "ecs-security-group"
+  vpc_id = aws_vpc.ecs_vpc.id
 
   ingress {
     protocol        = "tcp"
@@ -66,8 +66,8 @@ resource "aws_ecs_task_definition" "taskdef" {
 
   # EC2 backing vs fargate
   requires_compatibilities = ["FARGATE"]
-  cpu    = 1024
-  memory = 2048
+  cpu                      = 1024
+  memory                   = 2048
 
   # Summary: Task Roles allow the containers in your task to assume an IAM role
   # to call AWS APIs without having to use AWS credentials inside the container.
@@ -87,11 +87,11 @@ resource "aws_ecs_task_definition" "taskdef" {
 
   container_definitions = jsonencode([
     {
-      name      = "mehlj-pipeline"
-      image     = "252267185844.dkr.ecr.us-east-1.amazonaws.com/mehlj-pipeline:latest"
-      cpu       = 1024
-      memory    = 2048
-      essential = true
+      name         = "mehlj-pipeline"
+      image        = "252267185844.dkr.ecr.us-east-1.amazonaws.com/mehlj-pipeline:latest"
+      cpu          = 1024
+      memory       = 2048
+      essential    = true
       network_mode = "awsvpc"
       portMappings = [
         {
@@ -116,9 +116,9 @@ resource "aws_ecs_service" "service" {
   }
 
   load_balancer {
-      target_group_arn = aws_lb_target_group.asg-tg.arn
-      container_name = "mehlj-pipeline"
-      container_port = 80
+    target_group_arn = aws_lb_target_group.asg-tg.arn
+    container_name   = "mehlj-pipeline"
+    container_port   = 80
   }
 
   depends_on = [aws_lb_listener.ecs-lb-list]

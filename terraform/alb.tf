@@ -1,8 +1,8 @@
 # only allow port 80 to load balancer
 # allow all egress traffic out
 resource "aws_security_group" "ecs_alb_sg" {
-  name        = "ecs_alb_sg"
-  vpc_id      = aws_vpc.ecs_vpc.id
+  name   = "ecs_alb_sg"
+  vpc_id = aws_vpc.ecs_vpc.id
 
   ingress {
     description = "HTTP traffic"
@@ -22,9 +22,9 @@ resource "aws_security_group" "ecs_alb_sg" {
 }
 
 resource "aws_lb" "ecs-lb" {
-  name               = "ecs-lb"
-  subnets            = aws_subnet.public.*.id
-  security_groups    = [aws_security_group.ecs_alb_sg.id]
+  name            = "ecs-lb"
+  subnets         = aws_subnet.public.*.id
+  security_groups = [aws_security_group.ecs_alb_sg.id]
 
   enable_deletion_protection = false
 }
@@ -41,7 +41,7 @@ resource "aws_lb_listener" "ecs-lb-list" {
   load_balancer_arn = aws_lb.ecs-lb.arn
   port              = "80"
   protocol          = "HTTP"
-  
+
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.asg-tg.arn
