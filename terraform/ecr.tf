@@ -35,3 +35,32 @@ resource "aws_ecr_repository_policy" "ecrpolicy" {
   repository = aws_ecr_repository.ecr.name
   policy     = data.aws_iam_policy_document.ecrpolicy.json
 }
+
+resource "aws_ecr_lifecycle_policy" "repositoryPolicy" {
+  repository = aws_ecr_repository.ecr.name
+
+  policy = <<EOF
+{
+    "rules": [
+        {
+            "rulePriority": 1,
+            "description": "Delete old images for cost savings",
+            "selection": {
+                "tagStatus": "any",
+                "countType": "imageCountMoreThan",
+                "countNumber": 2
+            },
+            "action": {
+                "type": "expire"
+            }
+        }
+    ]
+}
+EOF
+}
+
+output "repository_url" {
+  description = "URL for the ECR repository."
+
+  value = aws_ecr_repository.ecr.repository_url
+}

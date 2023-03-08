@@ -1,79 +1,64 @@
-resource "aws_vpc" "ecs_vpc" {
-  cidr_block = "10.0.0.0/16"
+data "aws_availability_zones" "available_zones" {
+  state = "available"
 }
 
-resource "aws_subnet" "private" {
-  vpc_id            = aws_vpc.ecs_vpc.id
-  cidr_block        = "10.0.1.0/24"
-  availability_zone = "us-east-1"
+resource "aws_vpc" "ecs_vpc" {
+  cidr_block = "10.128.0.0/16"
 }
 
 resource "aws_subnet" "public" {
+  count             = 2
+  cidr_block        = cidrsubnet(aws_vpc.ecs_vpc.cidr_block, 8, 2 + count.index)
   vpc_id            = aws_vpc.ecs_vpc.id
-  cidr_block        = "10.0.2.0/24"
-  availability_zone = "us-east-1"
+  availability_zone = data.aws_availability_zones.available_zones.names[count.index]
 
   # instances launched in subnet get assigned a public IP
-  # TODO: how does this work with a predefined CIDR block?
   map_public_ip_on_launch = true
 }
 
+resource "aws_subnet" "private" {
+  count             = 2
+  cidr_block        = cidrsubnet(aws_vpc.ecs_vpc.cidr_block, 8, count.index)
+  vpc_id            = aws_vpc.ecs_vpc.id
+  availability_zone = data.aws_availability_zones.available_zones.names[count.index]
+}
+
 resource "aws_internet_gateway" "gw" {
-  depends_on = [
-    aws_vpc.ecs_vpc
-  ]
+  depends_on = [aws_vpc.ecs_vpc]
 
   vpc_id = aws_vpc.ecs_vpc.id
 }
 
-# default gateway for "public" subnet is the Internet Gateway
-resource "aws_route_table" "public" {
-  depends_on = [
-    aws_internet_gateway.gw
-  ]
-
-  vpc_id = aws_vpc.ecs_vpc.id
-
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.gw.id
-  }
+resource "aws_route" "internet_access" {
+  route_table_id         = aws_vpc.ecs_vpc.main_route_table_id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.gw.id
 }
 
-resource "aws_route_table" "private" {
-  vpc_id = aws_vpc.ecs_vpc.id
-}
-
-resource "aws_route_table_association" "public" {
-  subnet_id      = aws_subnet.public.id
-  route_table_id = aws_route_table.public.id
-}
-
-resource "aws_route_table_association" "private" {
-  subnet_id      = aws_subnet.private.id
-  route_table_id = aws_route_table.private.id
-}
-
-resource "aws_eip" "ecs_eip" {
-  depends_on = [
-    aws_internet_gateway.gw
-  ]
-
-  vpc = true
+resource "aws_eip" "gateway" {
+  count      = 2
+  depends_on = [aws_internet_gateway.gw]
+  vpc        = true
 }
 
 resource "aws_nat_gateway" "ecs_nat" {
-  depends_on = [
-    aws_subnet.private
-  ]
-
-  allocation_id = aws_eip.ecs_eip.id
-  subnet_id     = aws_subnet.public.id
+  count         = 2
+  allocation_id = element(aws_eip.gateway.*.id, count.index)
+  subnet_id     = element(aws_subnet.public.*.id, count.index)
 }
 
-# default gateway for "private" subnet is the NAT Gateway
-resource "aws_route" "nat_route" {
-  route_table_id         = aws_route_table.private.id
-  nat_gateway_id         = aws_nat_gateway.ecs_nat.id
-  destination_cidr_block = "0.0.0.0/0"
+resource "aws_route_table" "private" {
+  count  = 2
+  vpc_id = aws_vpc.ecs_vpc.id
+
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = element(aws_nat_gateway.ecs_nat.*.id, count.index)
+  }
+}
+
+resource "aws_route_table_association" "private" {
+  count          = 2
+  subnet_id      = element(aws_subnet.private.*.id, count.index)
+  route_table_id = element(aws_route_table.private.*.id, count.index)
 }

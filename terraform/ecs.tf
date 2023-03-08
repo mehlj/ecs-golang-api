@@ -1,5 +1,20 @@
-resource "aws_ecs_cluster" "ecs_cluster" {
-  name = "poc-cluster"
+resource "aws_security_group" "task_sg" {
+  name        = "ecs-security-group"
+  vpc_id      = aws_vpc.ecs_vpc.id
+
+  ingress {
+    protocol        = "tcp"
+    from_port       = 80
+    to_port         = 80
+    security_groups = [aws_security_group.ecs_alb_sg.id]
+  }
+
+  egress {
+    protocol    = "-1"
+    from_port   = 0
+    to_port     = 0
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
 data "aws_iam_policy_document" "ecs_task-assume-role-policy" {
@@ -41,12 +56,18 @@ resource "aws_iam_role_policy" "ecsTaskExecution_policy" {
   })
 }
 
+resource "aws_ecs_cluster" "ecs_cluster" {
+  name = "poc-cluster"
+}
+
 resource "aws_ecs_task_definition" "taskdef" {
   family       = "mehlj-pipeline"
-  network_mode = "bridge"
+  network_mode = "awsvpc"
 
   # EC2 backing vs fargate
-  requires_compatibilities = ["EC2"]
+  requires_compatibilities = ["FARGATE"]
+  cpu    = 1024
+  memory = 2048
 
   # Summary: Task Roles allow the containers in your task to assume an IAM role
   # to call AWS APIs without having to use AWS credentials inside the container.
@@ -63,13 +84,15 @@ resource "aws_ecs_task_definition" "taskdef" {
   # allows ECS agent to pull image from ECR
   execution_role_arn = aws_iam_role.ecsTaskExecution_role.arn
 
+
   container_definitions = jsonencode([
     {
       name      = "mehlj-pipeline"
       image     = "252267185844.dkr.ecr.us-east-1.amazonaws.com/mehlj-pipeline:latest"
-      cpu       = 200
-      memory    = 200
+      cpu       = 1024
+      memory    = 2048
       essential = true
+      network_mode = "awsvpc"
       portMappings = [
         {
           containerPort = 80
@@ -80,18 +103,23 @@ resource "aws_ecs_task_definition" "taskdef" {
   ])
 }
 
-
-# ALB and corresponding IAM roles TODO
 resource "aws_ecs_service" "service" {
   name            = "mehlj-pipeline"
   cluster         = aws_ecs_cluster.ecs_cluster.id
   task_definition = aws_ecs_task_definition.taskdef.arn
   desired_count   = 3
+  launch_type     = "FARGATE"
 
-  # iam_role        = var.service_arn
-  # load_balancer {
-  #     target_group_arn = aws_lb_target_group.autoscaleTG.arn
-  #     container_name = "first"
-  #     container_port = 80
-  # }
+  network_configuration {
+    security_groups = [aws_security_group.task_sg.id]
+    subnets         = aws_subnet.private.*.id
+  }
+
+  load_balancer {
+      target_group_arn = aws_lb_target_group.asg-tg.arn
+      container_name = "mehlj-pipeline"
+      container_port = 80
+  }
+
+  depends_on = [aws_lb_listener.ecs-lb-list]
 }
