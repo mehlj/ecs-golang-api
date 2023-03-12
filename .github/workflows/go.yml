@@ -93,6 +93,7 @@ jobs:
         docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REPOSITORY:latest
         docker push $ECR_REPOSITORY:latest
 
+
   deploy:
     name: Deploy ECR image to ECS cluster
     runs-on: ubuntu-22.04
@@ -100,6 +101,8 @@ jobs:
       run:
         working-directory: ./terraform
     needs: build
+    outputs:
+      ALB_URL: ${{ steps.get_alb_url.outputs.ALB_URL }}
 
     steps:
     - uses: actions/checkout@v3
@@ -116,3 +119,17 @@ jobs:
     - run: terraform fmt -check
     - run: terraform plan
     - run: terraform apply -auto-approve
+    - id: get_alb_url
+      run: echo "ALB_URL=$(terraform output -raw alb_domain_name)" >> "$GITHUB_OUTPUT"
+
+
+  validate:
+    name: Ensure app is responding publicly
+    runs-on: ubuntu-22.04
+    needs: deploy
+
+    steps:
+      - name: cURL for 5 minutes until errors out
+        env:
+          ALB_URL: ${{needs.deploy.outputs.ALB_URL}}
+        run: curl --head -X GET --retry 20 --retry-all-errors --retry-max-time 300 $ALB_URL 
