@@ -136,4 +136,4 @@ jobs:
       - name: cURL for 5 minutes until errors out
         env:
           ALB_URL: ${{needs.deploy.outputs.ALB_URL}}
-        run: curl --head -X GET --retry 20 --retry-all-errors --retry-max-time 300 $ALB_URL 
+        run: curl --head -X GET -v --retry 20 --retry-all-errors --retry-max-time 300 $ALB_URL 
