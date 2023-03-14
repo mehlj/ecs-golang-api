@@ -98,14 +98,8 @@ jobs:
         secrets: mehlj_lab_creds
         parse-json: true
 
-    - run: env
-    - run: echo $MEHLJ_LAB_CREDS_VAULT
-    - run: echo $MEHLJ_LAB_CREDS
-
     - id: get_dsn_url
-      run: echo "PG_DSN=postgres://$(terraform output -raw rds_username):${mehlj_lab_creds_vault}@$(terraform output -raw rds_hostname):5432" >> "$GITHUB_OUTPUT"
-    - run: echo "$GITHUB_OUTPUT"
-    - run: exit 1
+      run: echo "PG_DSN=postgres://$(terraform output -raw rds_username):${MEHLJ_LAB_CREDS_VAULT}@$(terraform output -raw rds_hostname):5432" >> "$GITHUB_OUTPUT"
 
   build:
     name: Build and push image to ECR
