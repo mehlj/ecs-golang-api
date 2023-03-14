@@ -101,7 +101,7 @@ jobs:
     - run: echo $mehlj_lab_creds
 
     - id: get_dsn_url
-    - run: echo "PG_DSN=postgres://$(terraform output -raw rds_username):${mehlj_lab_creds_vault}@$(terraform output -raw rds_hostname):5432" >> "$GITHUB_OUTPUT"
+      run: echo "PG_DSN=postgres://$(terraform output -raw rds_username):${mehlj_lab_creds_vault}@$(terraform output -raw rds_hostname):5432" >> "$GITHUB_OUTPUT"
     - run: echo "$GITHUB_OUTPUT"
     - run: exit 1
 
