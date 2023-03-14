@@ -96,9 +96,11 @@ jobs:
       uses: abhilash1in/aws-secrets-manager-action@v2.1.0
       with:
         secrets: mehlj_lab_creds
-        parse_json: true
+        parse-json: true
 
-    - run: echo $mehlj_lab_creds
+    - run: env
+    - run: echo $MEHLJ_LAB_CREDS_VAULT
+    - run: echo $MEHLJ_LAB_CREDS
 
     - id: get_dsn_url
       run: echo "PG_DSN=postgres://$(terraform output -raw rds_username):${mehlj_lab_creds_vault}@$(terraform output -raw rds_hostname):5432" >> "$GITHUB_OUTPUT"
