@@ -68,6 +68,9 @@ func QueryProduct(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	// prep database
+	CreateTable()
+
 	r := mux.NewRouter().StrictSlash(true)
 
 	r.HandleFunc("/", DefaultHandler)

@@ -9,6 +9,16 @@ import (
 
 // export PG_DSN=postgres://postgres:mypassword@rds-postgres.xxxxx.amazonaws.com:5432
 
+func CreateTable() {
+	// open connection
+	db, err := sql.Open("postgres", os.Getenv("PG_DSN"))
+	checkSQLError(err)
+
+	// format table properly
+	_, err = db.Exec("CREATE TABLE [IF NOT EXISTS] products(name STRING, quantity INT)")
+	checkSQLError(err)
+}
+
 func GetAllRows() []Product {
 	// open connection
 	db, err := sql.Open("postgres", os.Getenv("PG_DSN"))

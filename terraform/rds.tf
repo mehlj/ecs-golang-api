@@ -1,11 +1,11 @@
 resource "aws_security_group" "rds" {
   name   = "rds"
-  vpc_id =  aws_vpc.ecs_vpc.id
+  vpc_id = aws_vpc.ecs_vpc.id
 
   ingress {
-    from_port = 3306
-    to_port   = 3306
-    protocol  = "tcp"
+    from_port       = 3306
+    to_port         = 3306
+    protocol        = "tcp"
     security_groups = aws_security_group.task_sg.id
   }
 
@@ -33,6 +33,14 @@ resource "aws_db_parameter_group" "mehlj-pipeline" {
   }
 }
 
+data "aws_secretsmanager_secret" "secrets" {
+  arn = "arn:aws:secretsmanager:us-east-1:252267185844:secret:mehlj_lab_creds-j5VElQ"
+}
+
+data "aws_secretsmanager_secret_version" "current" {
+  secret_id = data.aws_secretsmanager_secret.secrets.id
+}
+
 resource "aws_db_instance" "mehlj-pipeline" {
   identifier             = "mehlj-pipeline"
   instance_class         = "db.t3.micro"
@@ -40,7 +48,7 @@ resource "aws_db_instance" "mehlj-pipeline" {
   engine                 = "postgres"
   engine_version         = "14.1"
   username               = "dbuser"
-  password               = var.db_password
+  password               = jsondecode(data.aws_secretsmanager_secret_version.current.secret_string)["vault"]
   db_subnet_group_name   = aws_db_subnet_group.mehlj-pipeline.name
   vpc_security_group_ids = [aws_security_group.rds.id]
   parameter_group_name   = aws_db_parameter_group.mehlj-pipeline.name
