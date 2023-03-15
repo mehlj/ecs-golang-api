@@ -94,7 +94,7 @@ resource "aws_ecs_task_definition" "taskdef" {
       essential = true
       environment = [
         {
-          name  = "PG_DSN"
+          name  = "TF_VAR_pg_dsn"
           value = var.pg_dsn
         }
       ]
