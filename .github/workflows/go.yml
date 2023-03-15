@@ -98,6 +98,9 @@ jobs:
 
     - id: get_dsn_url
       run: echo "TF_VAR_pg_dsn=postgres://$(terraform output -raw rds_username):${MEHLJ_LAB_CREDS_VAULT}@$(terraform output -raw rds_hostname):5432" >> "$GITHUB_OUTPUT"
+    
+    - run: echo "TF_VAR_pg_dsn=postgres://$(terraform output -raw rds_username):${MEHLJ_LAB_CREDS_VAULT}@$(terraform output -raw rds_hostname):5432" >> /tmp/file
+    - run: cat /tmp/file
 
   build:
     name: Build and push image to ECR
