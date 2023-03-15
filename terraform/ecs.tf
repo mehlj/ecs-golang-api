@@ -48,6 +48,7 @@ resource "aws_iam_role_policy" "ecsTaskExecution_policy" {
           "ecr:GetDownloadUrlForLayer",
           "ecr:BatchGetImage",
           "logs:CreateLogStream",
+          "logs:CreateLogGroup",
           "logs:PutLogEvents"
         ],
         "Resource" : "*"
@@ -105,6 +106,16 @@ resource "aws_ecs_task_definition" "taskdef" {
           hostPort      = 80
         }
       ]
+      # needs IAM as well
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = "ecs-poc"
+          awslogs-region        = "us-east-1"
+          awslogs-create-group  = "true"
+          awslogs-stream-prefix = "mehlj-pipeline"
+        }
+      }
     },
   ])
 }
