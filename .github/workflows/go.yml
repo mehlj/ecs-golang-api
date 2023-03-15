@@ -71,7 +71,7 @@ jobs:
       run:
         working-directory: ./terraform
     outputs:
-      DSN_URL: ${{ steps.get_dsn_url.outputs.DSN_URL }}
+      TF_PG_DSN: ${{ steps.get_dsn_url.outputs.TF_PG_DSN }}
 
     steps:
     - uses: actions/checkout@v3
@@ -99,7 +99,7 @@ jobs:
         parse-json: true
 
     - id: get_dsn_url
-      run: echo "PG_DSN=postgres://$(terraform output -raw rds_username):${MEHLJ_LAB_CREDS_VAULT}@$(terraform output -raw rds_hostname):5432" >> "$GITHUB_OUTPUT"
+      run: echo "TF_PG_DSN=postgres://$(terraform output -raw rds_username):${MEHLJ_LAB_CREDS_VAULT}@$(terraform output -raw rds_hostname):5432" >> "$GITHUB_OUTPUT"
 
   build:
     name: Build and push image to ECR
@@ -137,7 +137,7 @@ jobs:
     defaults:
       run:
         working-directory: ./terraform
-    needs: build
+    needs: [build, create_database]
     outputs:
       ALB_URL: ${{ steps.get_alb_url.outputs.ALB_URL }}
 
@@ -158,8 +158,9 @@ jobs:
 
     - run: terraform init
     - run: terraform fmt -check
-    - run: terraform plan
     - run: terraform apply -auto-approve
+      env:
+        TF_PG_DSN: ${{needs.create_database.outputs.TF_PG_DSN}}
     - id: get_alb_url
       run: echo "ALB_URL=$(terraform output -raw alb_domain_name)" >> "$GITHUB_OUTPUT"
 

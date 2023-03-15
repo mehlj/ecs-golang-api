@@ -92,6 +92,12 @@ resource "aws_ecs_task_definition" "taskdef" {
       cpu          = 1024
       memory       = 2048
       essential    = true
+      environment  = [
+        {
+          name  = "PG_DSN"
+          value = var.pg_dsn
+        }
+      ]
       network_mode = "awsvpc"
       portMappings = [
         {
