@@ -159,6 +159,9 @@ jobs:
 
     - run: terraform init
     - run: terraform fmt -check
+    - run: echo $TF_VAR_pg_dsn
+      env:
+        TF_VAR_pg_dsn: ${{needs.create_database.outputs.TF_VAR_pg_dsn}}
     - run: terraform apply -auto-approve
       env:
         TF_VAR_pg_dsn: ${{needs.create_database.outputs.TF_VAR_pg_dsn}}
