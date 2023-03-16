@@ -70,7 +70,7 @@ jobs:
       run:
         working-directory: ./terraform
     outputs:
-      TF_VAR_pg_dsn: ${{ steps.get_dsn_url.outputs.TF_VAR_pg_dsn }}
+      DSN_URL: ${{ steps.get_dsn_url.outputs.DSN_URL }}
 
     steps:
     - uses: actions/checkout@v3
@@ -97,9 +97,9 @@ jobs:
         parse-json: true
 
     - id: get_dsn_url
-      run: echo "TF_VAR_pg_dsn=postgres://$(terraform output -raw rds_username):${MEHLJ_LAB_CREDS_VAULT}@$(terraform output -raw rds_hostname):5432" >> "$GITHUB_OUTPUT"
+      run: echo "DSN_URL=postgres://$(terraform output -raw rds_username):${MEHLJ_LAB_CREDS_VAULT}@$(terraform output -raw rds_hostname):5432" >> "$GITHUB_OUTPUT"
     
-    - run: echo "TF_VAR_pg_dsn=postgres://$(terraform output -raw rds_username):${MEHLJ_LAB_CREDS_VAULT}@$(terraform output -raw rds_hostname):5432" >> /tmp/file
+    - run: echo "DSN_URL=postgres://$(terraform output -raw rds_username):${MEHLJ_LAB_CREDS_VAULT}@$(terraform output -raw rds_hostname):5432" >> /tmp/file
     - run: cat /tmp/file
 
   build:
@@ -159,12 +159,9 @@ jobs:
 
     - run: terraform init
     - run: terraform fmt -check
-    - run: echo $TF_VAR_pg_dsn
-      env:
-        TF_VAR_pg_dsn: ${{needs.create_database.outputs.TF_VAR_pg_dsn}}
     - run: terraform apply -auto-approve
       env:
-        TF_VAR_pg_dsn: ${{needs.create_database.outputs.TF_VAR_pg_dsn}}
+        TF_VAR_pg_dsn: ${{needs.create_database.outputs.DSN_URL}}
     - id: get_alb_url
       run: echo "ALB_URL=$(terraform output -raw alb_domain_name)" >> "$GITHUB_OUTPUT"
 
