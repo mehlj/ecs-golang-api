@@ -15,7 +15,7 @@ func CreateTable() {
 	checkSQLError(err)
 
 	// format table properly
-	_, err = db.Exec("CREATE TABLE IF NOT EXISTS products(name STRING, quantity INT)")
+	_, err = db.Exec("CREATE TABLE IF NOT EXISTS products(name TEXT, quantity INT)")
 	checkSQLError(err)
 }
 
