@@ -69,8 +69,6 @@ jobs:
     defaults:
       run:
         working-directory: ./terraform
-    outputs:
-      DSN_URL: ${{ steps.get_dsn_url.outputs.DSN_URL }}
 
     steps:
     - uses: actions/checkout@v3
@@ -89,18 +87,6 @@ jobs:
     - run: terraform init
     - run: terraform fmt -check
     - run: terraform apply -target aws_security_group.rds -target aws_db_subnet_group.mehlj-pipeline -target aws_db_parameter_group.mehlj-pipeline -target aws_db_instance.mehlj-pipeline -auto-approve
-
-    - name: Read secrets from AWS Secrets Manager into environment variables
-      uses: abhilash1in/aws-secrets-manager-action@v2.1.0
-      with:
-        secrets: mehlj_lab_creds
-        parse-json: true
-
-    - id: get_dsn_url
-      run: echo "DSN_URL=postgres://$(terraform output -raw rds_username):${MEHLJ_LAB_CREDS_VAULT}@$(terraform output -raw rds_hostname):5432" >> "$GITHUB_OUTPUT"
-    
-    - run: echo "DSN_URL=postgres://$(terraform output -raw rds_username):${MEHLJ_LAB_CREDS_VAULT}@$(terraform output -raw rds_hostname):5432" >> /tmp/file
-    - run: cat /tmp/file
 
   build:
     name: Build and push image to ECR
@@ -138,7 +124,7 @@ jobs:
     defaults:
       run:
         working-directory: ./terraform
-    needs: [build, create_database]
+    needs: build
     outputs:
       ALB_URL: ${{ steps.get_alb_url.outputs.ALB_URL }}
 
@@ -157,11 +143,19 @@ jobs:
         aws-region: us-east-1
         mask-aws-account-id: 'no' # https://github.com/orgs/community/discussions/26636
 
+    - name: Read database secrets from AWS Secrets Manager into environment variables
+      uses: abhilash1in/aws-secrets-manager-action@v2.1.0
+      with:
+        secrets: mehlj_lab_creds
+        parse-json: true
+
+    - name: Build Postgres DSN string
+      run: echo TF_VAR_pg_dsn="postgres://$(terraform output -raw rds_username):${MEHLJ_LAB_CREDS_VAULT}@$(terraform output -raw rds_hostname):5432" >> $GITHUB_ENV
+
     - run: terraform init
     - run: terraform fmt -check
     - run: terraform apply -auto-approve
-      env:
-        TF_VAR_pg_dsn: ${{needs.create_database.outputs.DSN_URL}}
+
     - id: get_alb_url
       run: echo "ALB_URL=$(terraform output -raw alb_domain_name)" >> "$GITHUB_OUTPUT"
 
