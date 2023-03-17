@@ -64,7 +64,7 @@ resource "aws_ecs_cluster" "ecs_cluster" {
 resource "aws_ecs_task_definition" "taskdef" {
   family       = "mehlj-pipeline"
   network_mode = "awsvpc"
-  tags         = var.image_tag
+  tags         = { "commit_sha" = var.image_tag }
 
   # EC2 backing vs fargate
   requires_compatibilities = ["FARGATE"]
