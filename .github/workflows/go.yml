@@ -149,10 +149,11 @@ jobs:
         secrets: mehlj_lab_creds
         parse-json: true
 
+    - run: terraform init
+
     - name: Build Postgres DSN string
       run: echo TF_VAR_pg_dsn="postgres://$(terraform output -raw rds_username):${MEHLJ_LAB_CREDS_VAULT}@$(terraform output -raw rds_hostname):5432" >> $GITHUB_ENV
 
-    - run: terraform init
     - run: terraform fmt -check
     - run: terraform apply -auto-approve
 
