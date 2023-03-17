@@ -64,27 +64,18 @@ resource "aws_ecs_cluster" "ecs_cluster" {
 resource "aws_ecs_task_definition" "taskdef" {
   family       = "mehlj-pipeline"
   network_mode = "awsvpc"
+  tags         = var.image_tag
 
   # EC2 backing vs fargate
   requires_compatibilities = ["FARGATE"]
   cpu                      = 1024
   memory                   = 2048
 
-  # Summary: Task Roles allow the containers in your task to assume an IAM role
-  # to call AWS APIs without having to use AWS credentials inside the container.
-  # I.e.: the application inside a container can access other AWS services, like an S3 bucket
-  # -----
-  # Keeping this blank for now, since the container app (nginx) doesn't need any other AWS services.
-  # Will need a role for RDS access when the app is migrated to a golang REST API
-  # task_role_arn = 
-
-
   # Summary: Execution Roles grant the ECS agents permission to make AWS API calls.
   # I.e.: The task is able to send container logs to CloudWatch or pull an image from ECR.
   # -----
   # allows ECS agent to pull image from ECR
   execution_role_arn = aws_iam_role.ecsTaskExecution_role.arn
-
 
   container_definitions = jsonencode([
     {

@@ -88,6 +88,7 @@ jobs:
     - run: terraform fmt -check
     - run: terraform apply -target aws_security_group.rds -target aws_db_subnet_group.mehlj-pipeline -target aws_db_parameter_group.mehlj-pipeline -target aws_db_instance.mehlj-pipeline -auto-approve
 
+
   build:
     name: Build and push image to ECR
     runs-on: ubuntu-22.04
@@ -154,6 +155,7 @@ jobs:
     - name: Build Postgres DSN string
       run: echo TF_VAR_pg_dsn="postgres://$(terraform output -raw rds_username):${MEHLJ_LAB_CREDS_VAULT}@$(terraform output -raw rds_hostname):5432/ecspoc" >> $GITHUB_ENV
 
+    - run: echo TF_VAR_image_tag="$GITHUB_SHA" >> $GITHUB_ENV
     - run: terraform fmt -check
     - run: terraform apply -auto-approve
 

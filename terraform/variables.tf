@@ -4,3 +4,9 @@ variable "pg_dsn" {
   sensitive   = true
   default     = "placeholder"
 }
+
+variable "image_tag" {
+  description = "Image tag that allows terraform to update ECS task definition every pipeline run"
+  type        = string
+  default     = "placeholder"
+}
