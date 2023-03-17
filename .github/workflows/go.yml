@@ -152,7 +152,7 @@ jobs:
     - run: terraform init
 
     - name: Build Postgres DSN string
-      run: echo TF_VAR_pg_dsn="postgres://$(terraform output -raw rds_username):${MEHLJ_LAB_CREDS_VAULT}@$(terraform output -raw rds_hostname):5432/mehlj-pipeline" >> $GITHUB_ENV
+      run: echo TF_VAR_pg_dsn="postgres://$(terraform output -raw rds_username):${MEHLJ_LAB_CREDS_VAULT}@$(terraform output -raw rds_hostname):5432/ecspoc" >> $GITHUB_ENV
 
     - run: terraform fmt -check
     - run: terraform apply -auto-approve

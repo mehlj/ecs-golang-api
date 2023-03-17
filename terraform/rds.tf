@@ -43,7 +43,7 @@ data "aws_secretsmanager_secret_version" "current" {
 
 resource "aws_db_instance" "mehlj-pipeline" {
   identifier             = "mehlj-pipeline"
-  db_name                = "mehlj-pipeline"
+  db_name                = "ecspoc"
   instance_class         = "db.t3.micro"
   allocated_storage      = 5
   engine                 = "postgres"
