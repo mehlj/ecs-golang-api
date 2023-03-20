@@ -47,7 +47,7 @@ func InsertRow(product Product) {
 	checkSQLError(err)
 
 	// build statement
-	stmt, err := db.Prepare("INSERT INTO products(name, quantity)  values(?,?)")
+	stmt, err := db.Prepare("INSERT INTO products(name, quantity)  values($1,$2)")
 	checkSQLError(err)
 
 	// execute statement
@@ -61,7 +61,7 @@ func RemoveRow(product Product) {
 	checkSQLError(err)
 
 	// delete product
-	_, err = db.Exec("DELETE FROM products WHERE name=?", product.Name)
+	_, err = db.Exec("DELETE FROM products WHERE name=$1", product.Name)
 	checkSQLError(err)
 }
 
@@ -71,7 +71,7 @@ func UpdateRow(product Product) {
 	checkSQLError(err)
 
 	// update product
-	_, err = db.Exec("UPDATE products SET quantity=? WHERE name=?", product.Quantity, product.Name)
+	_, err = db.Exec("UPDATE products SET quantity=$1 WHERE name=$2", product.Quantity, product.Name)
 	checkSQLError(err)
 }
 
@@ -81,7 +81,7 @@ func QueryRow(k string) Product {
 	checkSQLError(err)
 
 	// query product
-	rows, err := db.Query("SELECT * FROM products WHERE name=?", k)
+	rows, err := db.Query("SELECT * FROM products WHERE name=$1", k)
 	checkSQLError(err)
 
 	var name string
