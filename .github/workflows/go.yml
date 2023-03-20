@@ -11,30 +11,9 @@ defaults:
     shell: bash
 
 jobs:
-  # test:
-  #   name: Test golang API
-  #   runs-on: ubuntu-22.04
-
-  #   steps:
-  #   - uses: actions/checkout@v3
-  #   - uses: actions/setup-go@v3
-  #     with:
-  #       go-version: '1.20'
-
-  #   # - name: Grab go dependencies
-  #   #   run: go get -u github.com/gorilla/mux github.com/mattn/go-sqlite3
-    
-  #   - name: Run unit tests
-  #     run: go test -v api/main_test.go api/main.go api/sql.go
-    
-  #   # - name: Lint Dockerfile
-  #   #   run: hadolint Dockerfile
-
-
   create_repo:
     name: Deploy ECR repository
     runs-on: ubuntu-22.04
-    # needs: test
     defaults:
       run:
         working-directory: ./terraform
