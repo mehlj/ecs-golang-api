@@ -16,7 +16,7 @@ type Product struct {
 }
 
 func DefaultHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello World!\n")
+	fmt.Fprintf(w, "Hello World!!\n")
 }
 
 func QueryAllProducts(w http.ResponseWriter, r *http.Request) {
