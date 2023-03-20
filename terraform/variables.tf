@@ -6,7 +6,7 @@ variable "pg_dsn" {
 }
 
 variable "image_tag" {
-  description = "Image tag that allows terraform to update ECS task definition every pipeline run"
+  description = "Container image tag, corresponds to commit SHA"
   type        = string
   default     = "placeholder"
 }

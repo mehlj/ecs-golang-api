@@ -64,7 +64,6 @@ resource "aws_ecs_cluster" "ecs_cluster" {
 resource "aws_ecs_task_definition" "taskdef" {
   family       = "mehlj-pipeline"
   network_mode = "awsvpc"
-  tags         = { "commit_sha" = var.image_tag }
 
   # EC2 backing vs fargate
   requires_compatibilities = ["FARGATE"]
@@ -80,7 +79,8 @@ resource "aws_ecs_task_definition" "taskdef" {
   container_definitions = jsonencode([
     {
       name      = "mehlj-pipeline"
-      image     = "252267185844.dkr.ecr.us-east-1.amazonaws.com/mehlj-pipeline:latest"
+      #image     = "252267185844.dkr.ecr.us-east-1.amazonaws.com/mehlj-pipeline:latest"
+      image     = var.image_tag
       cpu       = 1024
       memory    = 2048
       essential = true
