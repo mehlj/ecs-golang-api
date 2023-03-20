@@ -7,8 +7,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// export PG_DSN=postgres://postgres:mypassword@rds-postgres.xxxxx.amazonaws.com:5432
-
 func CreateTable() {
 	// open connection
 	db, err := sql.Open("postgres", os.Getenv("PG_DSN"))
