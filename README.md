@@ -5,27 +5,30 @@ Golang REST API deployed to AWS
 ## API Interaction
 
 ### Create
-```
-$ curl -d '{"Name":"ball","quantity":4}' -X POST localhost/product
+```bash
+curl -d '{"Name":"ball","quantity":4}' -X POST localhost/product
 ```
 
 ### Read
+```bash
+curl localhost/products
 ```
-$ curl localhost:3000/products
+```bash
+curl localhost/product?name=ball
 ```
 
 ### Update
-```
-$ curl -d '{"Name":"ball","quantity":5}' -X PUT localhost/product
+```bash
+curl -d '{"Name":"ball","quantity":5}' -X PUT localhost/product
 ```
 
 ### Delete
-```
-$ curl -d '{"Name":"ball","quantity":5}' -X DELETE localhost/product
+```bash
+curl -d '{"Name":"ball","quantity":5}' -X DELETE localhost/product
 ```
 
 #### Go dependencies
-```
-$ go mod init mehlj-pipeline
-$ go mod tidy
+```bash
+go mod init mehlj-pipeline
+go mod tidy
 ```
